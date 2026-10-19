@@ -78,6 +78,8 @@ struct RoundParticipant: FirebaseSubcollectable, Playable {
     /// may replace it together with an auditable handicap snapshot.
     var leagueHandicapStrokesAtCreation: Int?
     var handicapSnapshot: RoundParticipantHandicapSnapshot?
+    /// True until a player with no resolved handicap explicitly enters an index or strokes.
+    var requiresHandicapEntry: Bool
 
     var seriesMemberID: String?
     var teamID: String?
@@ -108,6 +110,7 @@ struct RoundParticipant: FirebaseSubcollectable, Playable {
         handicapIndex: Double? = nil,
         leagueHandicapStrokesAtCreation: Int? = nil,
         handicapSnapshot: RoundParticipantHandicapSnapshot? = nil,
+        requiresHandicapEntry: Bool = false,
         seriesMemberID: String? = nil,
         teamID: String? = nil,
         groupID: String? = nil,
@@ -131,6 +134,7 @@ struct RoundParticipant: FirebaseSubcollectable, Playable {
         self.handicapIndex = handicapIndex
         self.leagueHandicapStrokesAtCreation = leagueHandicapStrokesAtCreation
         self.handicapSnapshot = handicapSnapshot
+        self.requiresHandicapEntry = requiresHandicapEntry
         self.seriesMemberID = seriesMemberID
         self.teamID = teamID
         self.groupID = groupID
@@ -173,6 +177,7 @@ struct RoundParticipant: FirebaseSubcollectable, Playable {
         self.handicapIndex = nil
         self.leagueHandicapStrokesAtCreation = nil
         self.handicapSnapshot = nil
+        self.requiresHandicapEntry = player.isOffline || player.handicaps.isEmpty
         self.seriesMemberID = nil
         self.teamID = teamID
         self.groupID = groupID
@@ -199,6 +204,7 @@ struct RoundParticipant: FirebaseSubcollectable, Playable {
         case handicapIndex = "handicap_index"
         case leagueHandicapStrokesAtCreation = "league_handicap_strokes_at_creation"
         case handicapSnapshot = "handicap_snapshot"
+        case requiresHandicapEntry = "requires_handicap_entry"
 
         case seriesMemberID = "series_member_id"
         case teamID = "team_id"
@@ -230,6 +236,7 @@ struct RoundParticipant: FirebaseSubcollectable, Playable {
         handicapIndex = try c.decodeIfPresent(Double.self, forKey: .handicapIndex)
         leagueHandicapStrokesAtCreation = try c.decodeIfPresent(Int.self, forKey: .leagueHandicapStrokesAtCreation)
         handicapSnapshot = try c.decodeIfPresent(RoundParticipantHandicapSnapshot.self, forKey: .handicapSnapshot)
+        requiresHandicapEntry = try c.decodeIfPresent(Bool.self, forKey: .requiresHandicapEntry) ?? false
 
         seriesMemberID = try c.decodeIfPresent(String.self, forKey: .seriesMemberID)
         teamID = try c.decodeIfPresent(String.self, forKey: .teamID)
