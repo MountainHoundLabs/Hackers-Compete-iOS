@@ -85,17 +85,22 @@ struct SeriesRoundCreationService: Loggable {
                     ? series.handicapConfig.config.maximumHandicap
                     : nil
             )
-            guard issues.isEmpty else {
+            // When league handicaps are off, a missing index is resolved in the lobby.
+            // Invalid tee/rating metadata still blocks Course HCP computation.
+            let blockingIssues = series.handicapConfig.isEnabled
+                ? issues
+                : issues.filter { $0.missingFields.contains { $0 != "handicap index" } }
+            guard blockingIssues.isEmpty else {
                 addBreadcrumb(
                     level: .warning,
                     message: "Series round creation blocked by participant Course HCP preflight",
                     parameters: [
                         "Series ID": series.id,
                         "Series Round ID": seriesRound.id,
-                        "Issue Count": "\(issues.count)"
+                        "Issue Count": "\(blockingIssues.count)"
                     ]
                 )
-                return .failure(.invalidCourseHandicaps(issues))
+                return .failure(.invalidCourseHandicaps(blockingIssues))
             }
         }
 
