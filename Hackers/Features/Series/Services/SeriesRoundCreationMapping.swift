@@ -1040,10 +1040,11 @@ enum SeriesRoundCreationMapping {
                 originalHandicap: originalHandicap,
                 adjustedHandicap: computedHandicap,
                 handicapIndex: handicapEntryFormat == .courseHandicap ? effectiveIndex : nil,
-                leagueHandicapStrokesAtCreation: computedHandicap,
-                handicapSnapshot: resolution.snapshot(
+                leagueHandicapStrokesAtCreation: effectiveIndex == nil ? nil : computedHandicap,
+                handicapSnapshot: effectiveIndex == nil ? nil : resolution.snapshot(
                     selectedHandicapScoreIDs: selectedHandicapScoreIDsByMemberID[member.id] ?? []
                 ),
+                requiresHandicapEntry: effectiveIndex == nil,
                 seriesMemberID: member.id,
                 teamID: teamMapping?.roundTeamID,
                 groupID: assignment?.groupID,
